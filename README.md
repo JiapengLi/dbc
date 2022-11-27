@@ -9,7 +9,7 @@ Let's go!
 - [ ] Support ISOTP message encoding and decoding (longer than 8)
 - [ ] Full support **ISO15031-5** & **J1979DA** 
   - [ ]  J1979DA `Supported IDs 0x00` for ISO15031-5 `Service 01 - 0A`
-- [ ] 
+- [ ] Mixed big and little endian
 
 With the help of this project, I hope to make it easy to design an OBD simulator for developer or even certification libraries.
 
@@ -18,6 +18,12 @@ With the help of this project, I hope to make it easy to design an OBD simulator
 
 
 ![File:Screenshot 2015-11-22 16.02.04.png](https://img.jiapeng.me/800px-Screenshot_2015-11-22_16.02.04.png)
+
+
+
+## Limitations
+
+- Service 01 PID13 and PID1D conflicts, use different variable name
 
 
 
