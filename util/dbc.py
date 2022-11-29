@@ -9,6 +9,15 @@ import pandas as pd
 def fmt(msg):
     return msg + (64 - len(msg)) * b'\x00'
 
+def tree(dbcfile):
+    db = cantools.database.load_file(dbcfile)
+    pprint(db.messages)
+    for m in db.messages:
+        # print(m.__dict__)
+        # example_message = db.get_message_by_name('RX')
+        pprint(m.signals)
+        pprint(m.signal_tree)
+
 def check(dbcfile):
     db = cantools.database.load_file(dbcfile)
     pprint(db.messages)
@@ -133,5 +142,6 @@ if __name__ == '__main__':
     fire.Fire({
         "check": check,
         "gen": gen,
+        "tree": tree,
     })
 

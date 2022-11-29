@@ -13,11 +13,21 @@ Let's go!
 
 With the help of this project, I hope to make it easy to design an OBD simulator for developer or even certification libraries.
 
-## About DBC Specification
+## DBC Specification
 
 
 
 ![File:Screenshot 2015-11-22 16.02.04.png](https://img.jiapeng.me/800px-Screenshot_2015-11-22_16.02.04.png)
+
+
+
+### Little Endian or Big Endian
+
+
+
+
+
+
 
 
 
