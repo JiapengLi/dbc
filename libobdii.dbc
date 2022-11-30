@@ -1230,7 +1230,7 @@ BO_ 2024 RX: 64 ECU
  SG_ EM_F_TQ m205 : 119|16@0+ (1,0) [0|0] "Nm" TOOL
  SG_ EM_G_TQ m205 : 135|16@0+ (1,0) [0|0] "Nm" TOOL
  SG_ EM_H_TQ m205 : 151|16@0+ (1,0) [0|0] "Nm" TOOL
- SG_ FRNO m2M : 24|8@1+ (1,0) [0|0] "" TOOL
+ SG_ FRNO m2 : 24|8@1+ (1,0) [0|0] "" TOOL
  SG_ S02_DTC_CNT m1 : 32|7@1+ (1,0) [0|0] "" TOOL
  SG_ S02_MIL m1 : 39|1@1+ (1,0) [0|0] "" TOOL
  SG_ S02_MIS_SUP m1 : 40|1@1+ (1,0) [0|0] "" TOOL

@@ -145,7 +145,7 @@ def gen_pid(service, dfpid, prefix=False):
     start_oft = 0
 
     if service == 2:
-        SG_ += f' SG_ FRNO m2M : 24|8@1+ (1,0) [0|0] "" TOOL\n'
+        SG_ += f' SG_ FRNO m2 : 24|8@1+ (1,0) [0|0] "" TOOL\n'
         SG_MUL_VAL_ = "SG_MUL_VAL_ 2024 FRNO S02_PID 1-31, 33-63, 65-95, 97-127, 129-159, 161-191, 193-255;\n"
         start_oft = 8
 
