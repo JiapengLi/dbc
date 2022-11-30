@@ -18,27 +18,47 @@ Let's go!
 ### Remark
 
 - Service 01 PID13 and PID1D conflicts, use different variable name
-- Service 01, 02 shares same PID definition, but service 02 need one extra `frame#` byte, which means DATA_x of Service 02 is 8 bits larger than Service 01
-- 
+- Service 01, 02 shares same PID definition, but service 02 need one extra `frame#` byte, which means DATA_x of Service 02 is 8 bits larger than Service 01.
+- **String** fields parse is not supported by dbc file (let me know if it does), the dbc file here will decode string into **a very long integer** and a conversion is necessary to be done at application layer, although this feature should be be programming language independent, but I suspect language like C may not support such feature well (also could be implementation related). **cantools library just supports this feature fine.**
 
 ## ISO15031-5
 
 ### Diagnostic service definition for ISO 15765-4
 
-| Service |   ID   | Comment                                                      | Status                       |
-| :-----: | :----: | ------------------------------------------------------------ | ---------------------------- |
-|   01    |  PID   | Request current powertrain diagnostic data                   | Full Supported               |
-|   02    |  PID   | Request powertrain freeze frame data                         | Supported without piggy-back |
-|   03    |  DTC   | Request emission-related diagnostic trouble codes (SAE J2012) |                              |
-|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |                              |
-|   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . |                              |
-|   06    |  MID   | Request on-board monitoring test results for specific monitored systems |                              |
-|   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |                              |
-|   08    |  TID   | Request control of on-board system, test, or component       |                              |
-|   09    | INFTYP | Request vehicle information                                  |                              |
-|   0A    |  DTC   | Request emission-related diagnostic trouble codes with permanent status |                              |
+| Service |   ID   | Comment                                                      | Development Status             |
+| :-----: | :----: | ------------------------------------------------------------ | ------------------------------ |
+|   01    |  PID   | Request current powertrain diagnostic data                   | Full Supported                 |
+|   02    |  PID   | Request powertrain freeze frame data                         | Supported (without piggy-back) |
+|   03    |  DTC   | Request emission-related diagnostic trouble codes (SAE J2012) | Supported (Max 30 DTCs)        |
+|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |                                |
+|   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . | Obsoleted                      |
+|   06    |  MID   | Request on-board monitoring test results for specific monitored systems |                                |
+|   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |                                |
+|   08    |  TID   | Request control of on-board system, test, or component       |                                |
+|   09    | INFTYP | Request vehicle information                                  |                                |
+|   0A    |  DTC   | Request emission-related diagnostic trouble codes with permanent status |                                |
 
 *Service is also referred as **SID**.* 
+
+
+
+## How To Use the DBC file?
+
+
+
+
+
+### Service 03
+
+```
+{'LEN': 8, 'SID': '03', 'DTCNUM': 6, 'DTC0_TYPE': 'P', 'DTC0_VAL': 323, 'DTC1_TYPE': 'P', 'DTC1_VAL': 406, 'DTC2_TYPE': 'P', 'DTC2_VAL': 564, 'DTC3_TYPE': 'P', 'DTC3_VAL': 717, 'DTC4_TYPE': 'P', 'DTC4_VAL': 855, 'DTC5_TYPE': 'P', 'DTC5_VAL': 2596, 'DTC6_TYPE': 'P', 'DTC6_VAL': 0, 'DTC7_TYPE': 'P', 'DTC7_VAL': 0, 'DTC8_TYPE': 'P', 'DTC8_VAL': 0, 'DTC9_TYPE': 'P', 'DTC9_VAL': 0, 'DTC10_TYPE': 'P', 'DTC10_VAL': 0, 'DTC11_TYPE': 'P', 'DTC11_VAL': 0, 'DTC12_TYPE': 'P', 'DTC12_VAL': 0, 'DTC13_TYPE': 'P', 'DTC13_VAL': 0, 'DTC14_TYPE': 'P', 'DTC14_VAL': 0, 'DTC15_TYPE': 'P', 'DTC15_VAL': 0, 'DTC16_TYPE': 'P', 'DTC16_VAL': 0, 'DTC17_TYPE': 'P', 'DTC17_VAL': 0, 'DTC18_TYPE': 'P', 'DTC18_VAL': 0, 'DTC19_TYPE': 'P', 'DTC19_VAL': 0, 'DTC20_TYPE': 'P', 'DTC20_VAL': 0, 'DTC21_TYPE': 'P', 'DTC21_VAL': 0, 'DTC22_TYPE': 'P', 'DTC22_VAL': 0, 'DTC23_TYPE': 'P', 'DTC23_VAL': 0, 'DTC24_TYPE': 'P', 'DTC24_VAL': 0, 'DTC25_TYPE': 'P', 'DTC25_VAL': 0, 'DTC26_TYPE': 'P', 'DTC26_VAL': 0, 'DTC27_TYPE': 'P', 'DTC27_VAL': 0, 'DTC28_TYPE': 'P', 'DTC28_VAL': 0, 'DTC29_TYPE': 'P', 'DTC29_VAL': 0}
+```
+
+
+
+
+
+
 
 ## DBC Specification
 

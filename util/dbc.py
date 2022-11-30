@@ -34,30 +34,26 @@ def check(dbcfile):
     pprint(msg)
 
     msg = db.decode_message(0x7E8, fmt(bytes.fromhex('14490201335657524136394d37344d303333393135')))
-    pprint(msg)
-    print(type(msg['VIN']))
-
-    pprint(int.to_bytes(msg['VIN'], 17, 'little'))
+    print(msg)
+    print(f"VIN: {int.to_bytes(msg['VIN'], 17, 'little').decode('utf-8')}")
 
     msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x01\x81\x07\xEF\x63\xAA"))
-    pprint(msg)
+    print(msg)
 
     msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x19\xA0\x78\xEF\x63\xAA"))
-    pprint(msg)
+    print(msg)
 
     msg = db.decode_message(0x7E8, fmt(b"\x08\x42\x02\x00\x01\x30\xFF\xAA"))
-    pprint(msg)
+    print(msg)
 
     msg = db.decode_message(0x7E8, fmt(b"\x08\x43\x02\x00\x00\x00\xFF\x40\x00\x00\x01"))
-    pprint(msg)
+    print(msg)
 
     msg = db.decode_message(0x7E8, fmt(b"\x08\x43\x06\x01\x43\x01\x96\x02\x34\x02\xCD\x03\x57\x0A\x24"))
     print(msg)
 
-
-
-    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x80\x01\xFF\xFF\xAA"))
-    # pprint(msg)
+    msg = db.decode_message(0x7E8, fmt(b"\x08\x7F\x04\x22\x01\xFF\xFF\xAA"))
+    print(msg)
     # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x7F\x01\xFF\xFF\xAA"))
     # pprint(msg)
     # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x00\x01\xFF\xFF\xAA"))
@@ -107,8 +103,7 @@ BU_:
 
 BO_ 2024 RX: 64 ECU
  SG_ LEN : 0|8@1+ (1,0) [0|0] "" TOOL
- SG_ SID M : 8|4@1+ (1,0) [0|0] "" TOOL
- SG_ SIDPR : 12|4@1+ (1,0) [0|0] "" TOOL'''
+ SG_ SID M : 8|8@1+ (1,0) [0|0] "" TOOL'''
 
 def val2str(v):
     fstr = f"{float(v):.15f}"
@@ -116,34 +111,52 @@ def val2str(v):
         return fstr
     return fstr.rstrip('0').rstrip('.')
 
-def gen_Sxx_PID():
-    SG_ = ""
-    SG_MUL_VAL_ = ""
+SUPPORTED_IDS_NAME = {
+    1: "PID",
+    2: "PID",
+    6: "MID",
+    8: "TID",
+    9: "ITID",
+}
+
+def gen_Sxx_xID():
+    SG_, SG_MUL_VAL_, VAL_ = "", "", ""
+    val_ = ""
     for i in range(1, 11):
         service = i
-        name = f"S{service:02X}_PID"
-        if service == 3:
+        sid = service+0x40
+        val_ += f'{sid} "{service:02X}" {service} "{service:02X}"'
+        if service not in SUPPORTED_IDS_NAME.keys():
             continue
+        idname = SUPPORTED_IDS_NAME[service]
+        name = f"S{service:02X}_{idname}"
         sg_ = f' SG_ {name} m{service}M : 16|8@1+ (1,0) [0|0] "" TOOL'
         SG_ += f'{sg_}\n'
-        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} SID {service}-{service};'
+        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} SID {sid}-{sid};'
         SG_MUL_VAL_ += f'{sg_mul_val}\n'
-    return SG_, SG_MUL_VAL_
+
+    VAL_ += f'VAL_ 2024 SID {val_} 127 "SIDNR";\n'
+
+    return SG_, SG_MUL_VAL_, VAL_
 
 def gen_supported_id():
     SG_, SG_MUL_VAL_, VAL_ = "", "", ""
 
     for i in range(70):
         service = i % 10 + 1
-        pid = 32 * (i // 10)
-        name = f'S{service:02X}_PID{pid:02X}_SupportedIDs_{pid + 1:02X}_{pid + 32:02X}'
-        sg_ = f' SG_ {name} m{pid} : 24|32@1+ (1,0) [0|0] "" TOOL'
+        id = 32 * (i // 10)
+
+        if service not in SUPPORTED_IDS_NAME.keys():
+            continue
+        idname = SUPPORTED_IDS_NAME[service]
+        name = f'S{service:02X}_{idname}{id:02X}_SupportedIDs_{id + 1:02X}_{id + 32:02X}'
+        sg_ = f' SG_ {name} m{id} : 24|32@1+ (1,0) [0|0] "" TOOL'
         SG_ += f'{sg_}\n'
-        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} S{service:02X}_PID {pid}-{pid};'
+        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} S{service:02X}_{idname} {id}-{id};'
         SG_MUL_VAL_ += f'{sg_mul_val}\n'
     return SG_, SG_MUL_VAL_
 
-def gen_pid(service, dfpid, prefix=False):
+def gen_service(service, dfpid, prefix=False):
     SG_, SG_MUL_VAL_, VAL_ = "", "", ""
 
     name_prefix = "" if service == 1 or not prefix else f"S{service:02X}_"
@@ -160,7 +173,8 @@ def gen_pid(service, dfpid, prefix=False):
         mux_value = row['mux_value']
         mux_value_trim = str(mux_value).replace("M","")
 
-        mux_name = f"{name_prefix}{row['mux_name']}" if not pd.isna(row['mux_name']) else f"S{service:02X}_PID"
+        idname = SUPPORTED_IDS_NAME[service]
+        mux_name = f"{name_prefix}{row['mux_name']}" if not pd.isna(row['mux_name']) else f"S{service:02X}_{idname}"
         name = f"{name_prefix}{row['short_name']}"
 
         start = int(row['start'])
@@ -187,13 +201,13 @@ def gen_pid(service, dfpid, prefix=False):
 
 def gen_dtc(service):
     SG_, SG_MUL_VAL_, VAL_ = "", "", ""
-
-    SG_ += f' SG_ DTCNUM m3 : 16|8@1+ (1,0) [0|0] "" TOOL\n'
-    SG_MUL_VAL_ += "SG_MUL_VAL_ 2024 DTCNUM SID 3-3;\n"
+    sid = 3 + 0x40
+    SG_ += f' SG_ DTCNUM m{sid} : 16|8@1+ (1,0) [0|0] "" TOOL\n'
+    SG_MUL_VAL_ += f"SG_MUL_VAL_ 2024 DTCNUM SID {sid}-{sid};\n"
 
     oft = 31
     for i in range(0, 30):
-        mux_value = 3
+        mux_value = sid
         mux_value_trim = str(mux_value).replace("M","")
         mux_name = "SID"
 
@@ -225,7 +239,18 @@ def gen_dtc(service):
 
     return SG_, SG_MUL_VAL_, VAL_
 
+def gen_negative_response():
+    SG_, SG_MUL_VAL_, VAL_ = "", "", ""
+    sid = 0x7F
+    SG_ += f' SG_ SIDRQ m{sid} : 16|8@1+ (1,0) [0|0] "" TOOL\n'
+    SG_MUL_VAL_ += f"SG_MUL_VAL_ 2024 SIDRQ SID {sid}-{sid};\n"
 
+    SG_ += f' SG_ RC m{sid} : 24|8@1+ (1,0) [0|0] "" TOOL\n'
+    SG_MUL_VAL_ += f"SG_MUL_VAL_ 2024 RC SID {sid}-{sid};\n"
+    val_ = f'VAL_ 2024 RC 33 "BRR" 34 "CNCORSE" 120 "RCR-RP" ;'
+    VAL_ += f"{val_}\n"
+
+    return SG_, SG_MUL_VAL_, VAL_
 
 def gen(dbfile):
     # dfsid = pd.read_excel(dbfile, "SID")
@@ -235,22 +260,29 @@ def gen(dbfile):
     SG_, SG_MUL_VAL_, VAL_ = "", "", ""
 
     # All services & pids multiplexor
-    sg_, sg_mul_val_ = gen_Sxx_PID()
+    sg_, sg_mul_val_, val_ = gen_Sxx_xID()
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
+    VAL_ += val_
 
     # All services Supported IDs
     sg_, sg_mul_val_ = gen_supported_id()
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
+    # Negative response message format
+    sg_, sg_mul_val_, val_ = gen_negative_response()
+    SG_ += sg_
+    SG_MUL_VAL_ += sg_mul_val_
+    VAL_ += val_
+
     # service 01, Parameter IDs (PID)
-    sg_, sg_mul_val_ = gen_pid(1, dfpid, prefix=False)
+    sg_, sg_mul_val_ = gen_service(1, dfpid, prefix=False)
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
     # service 02, Parameter IDs (PID)
-    sg_, sg_mul_val_ = gen_pid(2, dfpid, prefix=True)
+    sg_, sg_mul_val_ = gen_service(2, dfpid, prefix=True)
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
@@ -260,7 +292,7 @@ def gen(dbfile):
     VAL_ += val_
 
     # service 09, ITID
-    sg_, sg_mul_val_ = gen_pid(9, dfitid, prefix=False)
+    sg_, sg_mul_val_ = gen_service(9, dfitid, prefix=False)
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
@@ -274,6 +306,6 @@ if __name__ == '__main__':
         "check": check,
         "gen": gen,
         "tree": tree,
-        "test": gen_Sxx_PID,
+        "test": gen_Sxx_xID,
     })
 
