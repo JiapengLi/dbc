@@ -1,6 +1,6 @@
 # DBC
 
-After involved in Car OBD area, I get to know about DBC (DBC file is a proprietary format that describes the data over a CAN bus). But the whole DBC thing is a kind of mess, you can only get something to work, but indeed not all. So I decide to change it, the target of this project is to **open source a full functional DBC file to support ISO15031-4 and J1979DA**. 
+After involved in Car OBD area, I get to know about DBC (DBC file is a proprietary format that describes the data over a CAN bus). But the whole DBC thing is a kind of mess, you can only get something to work, but indeed not all. So I decide to change it, the target of this project is to **open source a full functional DBC file to support ISO15031-4 and SAE J1979DA**. 
 
 I hope to make it easy to design an OBD simulator for developers or even certification labs with the dbc file provided by this project.
 
@@ -9,7 +9,7 @@ Let's go!
 ## Features
 
 - [ ] Support ISOTP message encoding and decoding (longer than 8)
-- [ ] Full support **ISO15031-5-2015** & **J1979DA-202203** 
+- [ ] Full support **ISO15031-5-2015** & **SAE J1979DA-202203** 
   - [ ]  J1979DA `Supported IDs 0x00` for ISO15031-5 `Service 01 - 0A`
 - [ ] Mixed big endian and little endian encoding to make the dbc file more easier to read
 - [ ] Auto generate dbc file from excel template (it is possible to generate other format database with minimum development)
@@ -25,20 +25,20 @@ Let's go!
 
 ### Diagnostic service definition for ISO 15765-4
 
-| Service |   ID   | Comment                                                      |
-| :-----: | :----: | ------------------------------------------------------------ |
-|   01    |  PID   | Request current powertrain diagnostic data                   |
-|   02    |  PID   |                                                              |
-|   03    |  DTC   | Request emission-related diagnostic trouble codes            |
-|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |
-|   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . |
-|   06    |  MID   | Request on-board monitoring test results for specific monitored systems |
-|   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |
-|   08    |  TID   | Request control of on-board system, test, or component       |
-|   09    | INFTYP | Request vehicle information                                  |
-|   0A    |  DTC   | Request emission-related diagnostic trouble codes with permanent status |
+| Service |   ID   | Comment                                                      | Status                       |
+| :-----: | :----: | ------------------------------------------------------------ | ---------------------------- |
+|   01    |  PID   | Request current powertrain diagnostic data                   | Full Supported               |
+|   02    |  PID   | Request powertrain freeze frame data                         | Supported without piggy-back |
+|   03    |  DTC   | Request emission-related diagnostic trouble codes (SAE J2012) |                              |
+|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |                              |
+|   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . |                              |
+|   06    |  MID   | Request on-board monitoring test results for specific monitored systems |                              |
+|   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |                              |
+|   08    |  TID   | Request control of on-board system, test, or component       |                              |
+|   09    | INFTYP | Request vehicle information                                  |                              |
+|   0A    |  DTC   | Request emission-related diagnostic trouble codes with permanent status |                              |
 
-*Service is also referred as SID.*
+*Service is also referred as **SID**.* 
 
 ## DBC Specification
 
