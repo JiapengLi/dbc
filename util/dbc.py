@@ -39,21 +39,25 @@ def check(dbcfile):
 
     pprint(int.to_bytes(msg['VIN'], 17, 'little'))
 
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x01\xFF\xF0\xFF\xFF\xAA"))
+    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x01\x81\x07\xEF\x63\xAA"))
     pprint(msg)
 
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x02\x00\x01\xFF\xFF\xAA"))
+    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x19\xA0\x78\xEF\x63\xAA"))
     pprint(msg)
 
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x03\x00\x01\xFF\xFF\xAA"))
+    msg = db.decode_message(0x7E8, fmt(b"\x08\x42\x02\x00\x01\x30\xFF\xAA"))
     pprint(msg)
 
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x80\x01\xFF\xFF\xAA"))
-    pprint(msg)
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x7F\x01\xFF\xFF\xAA"))
-    pprint(msg)
-    msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x00\x01\xFF\xFF\xAA"))
-    pprint(msg)
+    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x02\x00\x01\xFF\xFF\xAA"))
+    # pprint(msg)
+    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x03\x00\x01\xFF\xFF\xAA"))
+    # pprint(msg)
+    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x80\x01\xFF\xFF\xAA"))
+    # pprint(msg)
+    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x7F\x01\xFF\xFF\xAA"))
+    # pprint(msg)
+    # msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x00\x01\xFF\xFF\xAA"))
+    # pprint(msg)
 
 
 
@@ -120,7 +124,7 @@ def gen_Sxx_PID():
         SG_MUL_VAL_ += f'{sg_mul_val}\n'
     return SG_, SG_MUL_VAL_
 
-def gen_sid():
+def gen_supported_id():
     SG_ = ""
     SG_MUL_VAL_ = ""
     for i in range(70):
@@ -133,10 +137,18 @@ def gen_sid():
         SG_MUL_VAL_ += f'{sg_mul_val}\n'
     return SG_, SG_MUL_VAL_
 
-def gen_pid(service, dfpid):
+def gen_pid(service, dfpid, prefix=False):
     SG_ = ""
     SG_MUL_VAL_ = ""
-    name_prefix = "" if service == 1 else f"S{service:02X}_"
+
+    name_prefix = "" if service == 1 or not prefix else f"S{service:02X}_"
+    start_oft = 0
+
+    if service == 2:
+        SG_ += f' SG_ FRNO m2M : 24|8@1+ (1,0) [0|0] "" TOOL\n'
+        SG_MUL_VAL_ = "SG_MUL_VAL_ 2024 FRNO S02_PID 1-31, 33-63, 65-95, 97-127, 129-159, 161-191, 193-255;\n"
+        start_oft = 8
+
     for i, row in dfpid.iterrows():
         if pd.isna(row['short_name']):
             continue
@@ -147,6 +159,9 @@ def gen_pid(service, dfpid):
         name = f"{name_prefix}{row['short_name']}"
 
         start = int(row['start'])
+        if start >= 24:
+            start += start_oft
+
         bits = int(row['bits'])
         endian = int(row['endian'])
         sign = row['sign']
@@ -172,30 +187,34 @@ def gen(dbfile):
 
     SG_, SG_MUL_VAL_ = "", ""
 
-    # service & pid multiplexor
+    # All services & pids multiplexor
     sg_, sg_mul_val_ = gen_Sxx_PID()
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
-    # service 01 - 0A, Supported IDs
-    sg_, sg_mul_val_ = gen_sid()
+    # All services Supported IDs
+    sg_, sg_mul_val_ = gen_supported_id()
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
-    # service 01, Parameter IDs
-    sg_, sg_mul_val_ = gen_pid(1, dfpid)
+    # service 01, Parameter IDs (PID)
+    sg_, sg_mul_val_ = gen_pid(1, dfpid, prefix=False)
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
-    # service 09, Parameter IDs
-    sg_, sg_mul_val_ = gen_pid(1, dfitid)
+    # service 02, Parameter IDs (PID)
+    sg_, sg_mul_val_ = gen_pid(2, dfpid, prefix=True)
+    SG_ += sg_
+    SG_MUL_VAL_ += sg_mul_val_
+
+    # service 09, ITID
+    sg_, sg_mul_val_ = gen_pid(9, dfitid, prefix=False)
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
 
     print(DBCHEADER)
     print(SG_)
-
     print(SG_MUL_VAL_)
 
 if __name__ == '__main__':
