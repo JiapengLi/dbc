@@ -35,6 +35,26 @@ BS_:
 
 BU_:
 
+
+BO_ 2015 TX: 8 TOOL
+ SG_ LEN : 0|8@1+ (1,0) [0|0] "" TOOL
+ SG_ SID M : 8|8@1+ (1,0) [0|0] "" TOOL
+ SG_ PID m1 : 16|8@1+ (1,0) [0|0] "" TOOL
+ SG_ MID m6 : 16|8@1+ (1,0) [0|0] "" TOOL
+ SG_ TID m8 : 16|8@1+ (1,0) [0|0] "" TOOL
+ SG_ ITID m9 : 16|8@1+ (1,0) [0|0] "" TOOL
+ SG_ RESERVED m3 : 24|8@1+ (1,0) [0|0] "" TOOL
+ SG_ FRMNO m2 : 24|8@1+ (1,0) [0|0] "" TOOL
+
+SG_MUL_VAL_ 2015 PID SID 1-1, 2-2;
+SG_MUL_VAL_ 2015 MID SID 6-6;
+SG_MUL_VAL_ 2015 TID SID 8-8;
+SG_MUL_VAL_ 2015 ITID SID 9-9;
+SG_MUL_VAL_ 2015 RESERVED SID 3-3, 4-4, 7-7, 10-10;
+SG_MUL_VAL_ 2015 FRMNO SID 2-2;
+
+VAL_ 2015 SID 1 "current data" 2 "freeze data" 3 "DTC" 4 "clear DTC" 5 "oxygen sensor monitoring test results" 6 "on-board monitoring test results" 7 "pending DTC" 8 "Request control of on-board system, test, or component" 9 "vehicle information" 10 "permanent DTC";
+
 BO_ 2024 RX: 64 ECU
  SG_ LEN : 0|8@1+ (1,0) [0|0] "" TOOL
  SG_ SID M : 8|8@1+ (1,0) [0|0] "" TOOL
@@ -4762,7 +4782,7 @@ SG_MUL_VAL_ 2024 IPT_PFCOND1 S09_ITID 8-8;
 SG_MUL_VAL_ 2024 IPT_PFCOMP2 S09_ITID 8-8;
 SG_MUL_VAL_ 2024 IPT_PFCOND2 S09_ITID 8-8;
 
-VAL_ 2024 SID 65 "01" 1 "01"66 "02" 2 "02"67 "03" 3 "03"68 "04" 4 "04"69 "05" 5 "05"70 "06" 6 "06"71 "07" 7 "07"72 "08" 8 "08"73 "09" 9 "09"74 "0A" 10 "0A" 127 "SIDNR";
+VAL_ 2024 SID 65 "01" 1 "01" 66 "02" 2 "02" 67 "03" 3 "03" 68 "04" 4 "04" 69 "05" 5 "05" 70 "06" 6 "06" 71 "07" 7 "07" 72 "08" 8 "08" 73 "09" 9 "09" 74 "0A" 10 "0A" 127 "SIDNR";
 VAL_ 2024 RC 33 "BRR" 34 "CNCORSE" 120 "RCR-RP" ;
 VAL_ 2024 DTC0_TYPE 0 "P" 1 "C" 2 "B" 3 "U" ;
 VAL_ 2024 DTC1_TYPE 0 "P" 1 "C" 2 "B" 3 "U" ;

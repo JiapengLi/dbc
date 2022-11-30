@@ -42,16 +42,35 @@ Let's go!
 
 
 
-## How To Use the DBC file?
+## How to Use `libobdii.dbc`
 
+### Service 03 DTC Parse
 
-
-
-
-### Service 03
+ISO15031-5-2015 example: `"\x08\x43\x06\x01\x43\x01\x96\x02\x34\x02\xCD\x03\x57\x0A\x24"` will be parsed into below options, `\x08` is just used to cheat on dbc parser library, it is a fake isotp header fill. `DTCNUM` should be used to traverse the valid value in dbc parsed message.
 
 ```
-{'LEN': 8, 'SID': '03', 'DTCNUM': 6, 'DTC0_TYPE': 'P', 'DTC0_VAL': 323, 'DTC1_TYPE': 'P', 'DTC1_VAL': 406, 'DTC2_TYPE': 'P', 'DTC2_VAL': 564, 'DTC3_TYPE': 'P', 'DTC3_VAL': 717, 'DTC4_TYPE': 'P', 'DTC4_VAL': 855, 'DTC5_TYPE': 'P', 'DTC5_VAL': 2596, 'DTC6_TYPE': 'P', 'DTC6_VAL': 0, 'DTC7_TYPE': 'P', 'DTC7_VAL': 0, 'DTC8_TYPE': 'P', 'DTC8_VAL': 0, 'DTC9_TYPE': 'P', 'DTC9_VAL': 0, 'DTC10_TYPE': 'P', 'DTC10_VAL': 0, 'DTC11_TYPE': 'P', 'DTC11_VAL': 0, 'DTC12_TYPE': 'P', 'DTC12_VAL': 0, 'DTC13_TYPE': 'P', 'DTC13_VAL': 0, 'DTC14_TYPE': 'P', 'DTC14_VAL': 0, 'DTC15_TYPE': 'P', 'DTC15_VAL': 0, 'DTC16_TYPE': 'P', 'DTC16_VAL': 0, 'DTC17_TYPE': 'P', 'DTC17_VAL': 0, 'DTC18_TYPE': 'P', 'DTC18_VAL': 0, 'DTC19_TYPE': 'P', 'DTC19_VAL': 0, 'DTC20_TYPE': 'P', 'DTC20_VAL': 0, 'DTC21_TYPE': 'P', 'DTC21_VAL': 0, 'DTC22_TYPE': 'P', 'DTC22_VAL': 0, 'DTC23_TYPE': 'P', 'DTC23_VAL': 0, 'DTC24_TYPE': 'P', 'DTC24_VAL': 0, 'DTC25_TYPE': 'P', 'DTC25_VAL': 0, 'DTC26_TYPE': 'P', 'DTC26_VAL': 0, 'DTC27_TYPE': 'P', 'DTC27_VAL': 0, 'DTC28_TYPE': 'P', 'DTC28_VAL': 0, 'DTC29_TYPE': 'P', 'DTC29_VAL': 0}
+{
+    "LEN": 8,
+    "SID": "03",
+    "DTCNUM": 6,
+    "DTC0_TYPE": "P",
+    "DTC0_VAL": 323,
+    "DTC1_TYPE": "P",
+    "DTC1_VAL": 406,
+    "DTC2_TYPE": "P",
+    "DTC2_VAL": 564,
+    "DTC3_TYPE": "P",
+    "DTC3_VAL": 717,
+    "DTC4_TYPE": "P",
+    "DTC4_VAL": 855,
+    "DTC5_TYPE": "P",
+    "DTC5_VAL": 2596,
+    "DTC6_TYPE": "P",
+    "DTC6_VAL": 0,
+...
+    "DTC29_TYPE": "P",
+    "DTC29_VAL": 0
+}
 ```
 
 
@@ -114,7 +133,19 @@ DBC SG_ doesn't support **string** or **array** (list) format.
 
 DBC BO_ expected a fixed length message? It is not good if so.
 
+## Development
 
+Generate dbc file:
+
+```
+python3 util/dbc.py gen dbc.xlsx > libobdii.dbc
+```
+
+dbc file verification:
+
+```
+python3 util/dbc.py check libobdii.dbc
+```
 
 ## Acknowledgement
 
