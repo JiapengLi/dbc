@@ -55,6 +55,11 @@ def check(dbcfile):
     msg = db.decode_message(0x7E8, fmt(b"\x08\x41\x0E\x00\x01\xFF\xFF\xAA"))
     pprint(msg)
 
+
+
+
+
+
 DBCHEADER='''VERSION "v0.0.1"
 
 
@@ -93,9 +98,9 @@ BS_:
 BU_:
 
 BO_ 2024 RX: 64 ECU
- SG_ RXLEN : 0|8@1+ (1,0) [0|0] "" TOOL
- SG_ SERVICE M : 8|4@1+ (1,0) [0|0] "" TOOL
- SG_ RXACK : 12|4@1+ (1,0) [0|0] "" TOOL'''
+ SG_ LEN : 0|8@1+ (1,0) [0|0] "" TOOL
+ SG_ SID M : 8|4@1+ (1,0) [0|0] "" TOOL
+ SG_ SIDPR : 12|4@1+ (1,0) [0|0] "" TOOL'''
 
 def val2str(v):
     fstr = f"{float(v):.15f}"
@@ -111,7 +116,7 @@ def gen_Sxx_PID():
         name = f"S{service:02X}_PID"
         sg_ = f' SG_ {name} m{service}M : 16|8@1+ (1,0) [0|0] "" TOOL'
         SG_ += f'{sg_}\n'
-        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} SERVICE {service}-{service};'
+        sg_mul_val = f'SG_MUL_VAL_ 2024 {name} SID {service}-{service};'
         SG_MUL_VAL_ += f'{sg_mul_val}\n'
     return SG_, SG_MUL_VAL_
 
@@ -182,27 +187,16 @@ def gen(dbfile):
     SG_ += sg_
     SG_MUL_VAL_ += sg_mul_val_
 
+    # service 09, Parameter IDs
+    sg_, sg_mul_val_ = gen_pid(1, dfitid)
+    SG_ += sg_
+    SG_MUL_VAL_ += sg_mul_val_
+
+
     print(DBCHEADER)
     print(SG_)
 
     print(SG_MUL_VAL_)
-
-    return
-
-    index = 'SG_'
-    for df in dfs:
-        for i, row in df.iterrows():
-            if pd.isna(row[index]):
-                continue
-            print(row[index])
-
-    print(DBC_SG_MUL_VAL_HEADER)
-    index = 'SG_MUL_VAL_'
-    for df in dfs:
-        for i, row in df.iterrows():
-            if pd.isna(row[index]):
-                continue
-            print(row[index])
 
 if __name__ == '__main__':
     fire.Fire({

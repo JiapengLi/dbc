@@ -21,7 +21,24 @@ Let's go!
 - Service 01, 02 shares same PID definition, but service 02 need one extra `frame#` byte, which means DATA_x of Service 02 is 8 bits larger than Service 01
 - 
 
+## ISO15031-5
 
+### Diagnostic service definition for ISO 15765-4
+
+| Service |   ID   | Comment                                                      |
+| :-----: | :----: | ------------------------------------------------------------ |
+|   01    |  PID   | Request current powertrain diagnostic data                   |
+|   02    |  PID   |                                                              |
+|   03    |  DTC   | Request emission-related diagnostic trouble codes            |
+|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |
+|   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . |
+|   06    |  MID   | Request on-board monitoring test results for specific monitored systems |
+|   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |
+|   08    |  TID   | Request control of on-board system, test, or component       |
+|   09    | INFTYP | Request vehicle information                                  |
+|   0A    |  DTC   | Request emission-related diagnostic trouble codes with permanent status |
+
+*Service is also referred as SID.*
 
 ## DBC Specification
 
@@ -71,7 +88,7 @@ A real example, RPM dbc parser  looks like below:
 
 DBC SG_ can support number based types like int / float (double) / enum.
 
-DBC SG_ doesn't support string or array (list) format.
+DBC SG_ doesn't support **string** or **array** (list) format.
 
 #### Fixed length message
 
