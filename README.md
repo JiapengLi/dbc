@@ -1,6 +1,6 @@
 # DBC
 
-After involved in Car OBD area, I get to know about DBC (DBC file is a proprietary format that describes the data over a CAN bus). But the whole DBC thing is a kind of mess, you can only get something to work, but indeed not all. So I decide to change it, the target of this project is to **open source a full functional DBC file to support ISO15031-4 and SAE J1979DA**. 
+After involved in Car OBD area, I get to know about DBC (*DBC file is a proprietary format that describes the data over a CAN bus*). But the whole DBC thing is a kind of mess, you can only get something to work, but always not all. So I decide to develop this project to change it, the target of this project is to **open source a full functional DBC file to support ISO15031-4 and SAE J1979DA**. 
 
 I hope to make it easy to design an OBD simulator for developers or even certification labs with the dbc file provided by this project.
 
@@ -8,18 +8,20 @@ Let's go!
 
 ## Features
 
-- [ ] Support ISOTP message encoding and decoding (longer than 8)
-- [ ] Full support **ISO15031-5-2015** & **SAE J1979DA-202203** 
-  - [ ]  J1979DA `Supported IDs 0x00` for ISO15031-5 `Service 01 - 0A`
-- [ ] Mixed big endian and little endian encoding to make the dbc file more easier to read
-- [ ] Auto generate dbc file from excel template (it is possible to generate other format database with minimum development)
-- [ ] 
+- Full support **ISO15031-5-2015** & **SAE J1979DA-202203** 
+  - J1979DA `Supported IDs 0x00` for ISO15031-5 `Service 01 - 0A`
+  - Support 0x7DF message encoding
+  - Support ISOTP message decoding (longer than 8)
+- Mixed big endian and little endian encoding to make the dbc file more easier to read
+- Auto generate dbc file from excel template (it is possible to generate other format database with minimum development)
+- 
 
 ### Remark
 
 - Service 01 PID13 and PID1D conflicts, use different variable name
 - Service 01, 02 shares same PID definition, but service 02 need one extra `frame#` byte, which means DATA_x of Service 02 is 8 bits larger than Service 01.
 - **String** fields parse is not supported by dbc file (let me know if it does), the dbc file here will decode string into **a very long integer** and a conversion is necessary to be done at application layer, although this feature should be be programming language independent, but I suspect language like C may not support such feature well (also could be implementation related). **cantools library just supports this feature fine.**
+- Supported IDs map is not extracted by `libobdii.dbc`, it leaves to 
 
 ## ISO15031-5
 
@@ -30,7 +32,7 @@ Let's go!
 |   01    |  PID   | Request current powertrain diagnostic data                   | Full Supported                 |
 |   02    |  PID   | Request powertrain freeze frame data                         | Supported (without piggy-back) |
 |   03    |  DTC   | Request emission-related diagnostic trouble codes (SAE J2012) | Supported (Max 30 DTCs)        |
-|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. |                                |
+|   04    |   -    | Clear/Reset emission-related diagnostic information. The purpose of this service is to provide a means for the external test equipment to command ECUs to clear all emission-related diagnostic information. | Full Supported                 |
 |   05    |   -    | Service 05 is not supported for ISO 15765-4. The functionality of Service 05 16 is implemented in Service 06 . | Obsoleted                      |
 |   06    |  MID   | Request on-board monitoring test results for specific monitored systems |                                |
 |   07    |  DTC   | Request emission-related diagnostic trouble codes detected during current or last completed driving cycle |                                |
