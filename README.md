@@ -77,10 +77,6 @@ ISO15031-5-2015 example: `"\x08\x43\x06\x01\x43\x01\x96\x02\x34\x02\xCD\x03\x57\
 
 
 
-
-
-
-
 ## DBC Specification
 
 ![J1939 EEC1 EngSpeed RPM CAN DBC File Database Format Message Signal](https://img.jiapeng.me/CAN-DBC-File-Format-Explained-Intro-Basics_2.png)

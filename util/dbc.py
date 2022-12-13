@@ -76,8 +76,7 @@ SG_MUL_VAL_ 2015 TID SID 8-8;
 SG_MUL_VAL_ 2015 ITID SID 9-9;
 SG_MUL_VAL_ 2015 RESERVED SID 3-3, 4-4, 7-7, 10-10;
 SG_MUL_VAL_ 2015 FRMNO SID 2-2;
-
-VAL_ 2015 SID 1 "current data" 2 "freeze data" 3 "DTC" 4 "clear DTC" 5 "oxygen sensor monitoring test results" 6 "on-board monitoring test results" 7 "pending DTC" 8 "Request control of on-board system, test, or component" 9 "vehicle information" 10 "permanent DTC";'''
+'''
 
 SUPPORTED_IDS_NAME = {
     1: "PID",
@@ -134,6 +133,9 @@ def gen_service(service, dfpid, prefix=False):
         SG_ += f' SG_ FRNO m2 : 24|8@1+ (1,0) [0|0] "" TOOL\n'
         SG_MUL_VAL_ += "SG_MUL_VAL_ 2024 FRNO S02_PID 1-31, 33-63, 65-95, 97-127, 129-159, 161-191, 193-255;\n"
         start_oft = 8
+    elif service == 9:
+        SG_ += f' SG_ NODI m9 : 24|8@1+ (1,0) [0|0] "" TOOL\n'
+        SG_MUL_VAL_ += "SG_MUL_VAL_ 2024 NODI S09_PID 1-31, 33-63, 65-95, 97-127, 129-159, 161-191, 193-255;\n"
 
     for i, row in dfpid.iterrows():
         if pd.isna(row['short_name']):
@@ -308,25 +310,25 @@ def check_encode(db):
 
     print()
 
-    print("encode by name:")
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "current data", "PID": 0x10, }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 3, "SID": "freeze data", "PID": 0x20, "FRMNO": 0, }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "DTC", }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "oxygen sensor monitoring test results", }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "on-board monitoring test results", "MID": 0x60, }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "pending DTC", }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "Request control of on-board system, test, or component", "TID": 0x80, }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "vehicle information", "ITID": 0x90, }, strict=False)
-    print(msg.hex())
-    msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "permanent DTC", }, strict=False)
-    print(msg.hex())
+    # print("encode by name:")
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "current data", "PID": 0x10, }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 3, "SID": "freeze data", "PID": 0x20, "FRMNO": 0, }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "DTC", }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "oxygen sensor monitoring test results", }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "on-board monitoring test results", "MID": 0x60, }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 1, "SID": "pending DTC", }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "Request control of on-board system, test, or component", "TID": 0x80, }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "vehicle information", "ITID": 0x90, }, strict=False)
+    # print(msg.hex())
+    # msg = db.encode_message(0x7DF, {"RESERVED": 0, "LEN": 2, "SID": "permanent DTC", }, strict=False)
+    # print(msg.hex())
 
 def check_decode(db):
     # db.get_message_
@@ -384,7 +386,12 @@ def checktx(dbcfile):
     pprint(db.messages)
     for m in db.messages:
         pprint(m.signals)
-    check_encode(db)
+
+    dbtx = db.get_message_by_name("TX")
+    msg = dbtx.encode({"RESERVED": 0, "LEN": 2, "SID": "permanent DTC", })
+    print(msg.hex(), type(msg))
+
+    # check_encode(db)
 
 
 def tree(dbcfile):
@@ -396,6 +403,12 @@ def tree(dbcfile):
         pprint(m.signals)
         pprint(m.signal_tree)
 
+def decode(dbcfile, hmsg):
+    db = cantools.database.load_file(dbcfile)
+    msg = db.decode_message(0x7E8, padding(bytes.fromhex(hmsg)))
+    pprint(msg)
+
+
 if __name__ == '__main__':
     fire.Fire({
         "check": check,
@@ -403,5 +416,6 @@ if __name__ == '__main__':
         "gentx": gentx,
         "tree": tree,
         "test": checktx,
+        "decode": decode,
     })
 
